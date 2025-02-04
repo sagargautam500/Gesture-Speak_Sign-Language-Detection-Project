@@ -1,0 +1,120 @@
+/* Header Styles */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  background: linear-gradient(90deg, #007bff, #00c6ff);
+  color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.logo img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+/* Navigation Links */
+.nav {
+  display: flex;
+  gap: 40px;
+  align-items: center;
+  transition: transform 0.3s ease-in-out, opacity 0.3s ease;
+  margin-right: 50px;
+}
+
+.nav a {
+  color: white;
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 5px 15px;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+}
+
+.nav a:hover {
+  background-color: white;
+  color: #007bff;
+  transform: scale(1.1);
+}
+
+.nav a.active-link {
+  background-color: #ffeb3b;
+  color: black;
+  font-weight: bold;
+}
+
+/* Accessibility Button */
+.accessibility-btn {
+  background: white;
+  color: #007bff;
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 8px 15px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+}
+
+.accessibility-btn:hover {
+  background: #ffeb3b;
+  color: black;
+  transform: scale(1.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .nav {
+    display: none;
+    position: absolute;
+    top: 60px;
+    right: 0;
+    background: #007bff;
+    width: 100%;
+    flex-direction: column;
+    padding: 15px 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 0 0 10px 10px;
+  }
+
+  .nav.nav-open {
+    display: flex;
+  }
+
+  .nav a {
+    text-align: center;
+    padding: 10px;
+    border-radius: 0;
+    font-size: 1.1rem;
+  }
+
+  .nav a:hover {
+    background-color: white;
+    color: #007bff;
+  }
+
+  .accessibility-btn {
+    font-size: 1.2rem;
+    display: block;
+  }
+}
+
+@media (min-width: 769px) {
+  .accessibility-btn {
+    display: none;
+  }
+}

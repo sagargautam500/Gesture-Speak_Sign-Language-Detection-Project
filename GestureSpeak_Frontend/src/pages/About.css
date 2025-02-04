@@ -1,0 +1,107 @@
+.about-page {
+  padding: 40px;
+  background-color: #f9f9f9;
+  text-align: center;
+}
+
+.about-header {
+  margin-bottom: 30px;
+}
+
+.about-header h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
+.about-header p {
+  font-size: 1.2rem;
+  color: #666;
+  max-width: 800px;
+  margin: 0 auto 20px;
+}
+
+.about-section {
+  margin-top: 30px;
+}
+
+.about-section h2 {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.about-section p {
+  font-size: 1.2rem;
+  color: #555;
+  line-height: 1.6;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.about-team {
+  margin-top: 30px;
+}
+
+.about-team h2 {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.team-cards {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  margin-top: 30px;
+}
+
+.team-card {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 250px;
+  margin: 20px;
+  padding: 20px;
+  text-align: center;
+}
+
+.team-photo {
+  width: 100%;
+  height: auto;
+  border-radius: 50%;
+  margin-bottom: 15px;
+}
+
+.team-name {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.team-role {
+  font-size: 1.2rem;
+  color: #4CAF50;
+  margin-bottom: 10px;
+}
+
+.team-detail {
+  font-size: 1rem;
+  color: #555;
+  margin: 5px 0;
+}
+
+.team-detail strong {
+  font-weight: bold;
+}
+
+.about-tech, .about-contact {
+  margin-top: 30px;
+}
+
+.about-tech p, .about-contact p {
+  font-size: 1.2rem;
+  color: #555;
+  margin-top: 20px;
+}

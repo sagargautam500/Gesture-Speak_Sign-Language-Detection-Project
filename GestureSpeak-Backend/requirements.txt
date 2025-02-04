@@ -1,0 +1,11 @@
+flask==3.1.0
+flask-cors==3.0.10
+tensorflow-gpu==2.10.0
+numpy==1.26.4
+ultralytics==8.3.7
+pyttsx3
+opencv-python==4.10.0.84
+torch==2.4.1+cu124
+torchaudio==2.4.1+cu124
+torchvision==0.19.1+cu124
+pillow==11.0.0

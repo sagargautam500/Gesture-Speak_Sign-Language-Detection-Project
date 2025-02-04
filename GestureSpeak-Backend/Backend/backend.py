@@ -38,7 +38,7 @@ try:
     )
 
     # Load YOLO Model
-    yolo_model = YOLO("../models/best.pt").to("cuda")
+    yolo_model = YOLO("../models/best.pt")
 
 except Exception as e:
     print(f"Error loading models: {str(e)}")
@@ -183,7 +183,7 @@ def classify_image():
 def detect_gesture():
     def generate_frames():
         # Initialize camera and TTS variables per client
-        cap = cv2.VideoCapture(1)  # Adjust camera index if needed
+        cap = cv2.VideoCapture(0)  # Adjust camera index if needed
         last_spoken = None  # Track last spoken gesture per client
 
         try:

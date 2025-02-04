@@ -5,46 +5,11 @@ import numpy as np
 from PIL import Image
 from ultralytics import YOLO
 import cv2
-import base64
-from io import BytesIO
+import pyttsx3
+import threading
 
-# ---------------------------------------------
-# Uncomment if you need custom layer definitions.
 
-# ---------------------------------------------
-# from tensorflow.keras.layers import InputLayer, BatchNormalization
-# from tensorflow.keras.layers.experimental import SyncBatchNormalization
-# from tensorflow.keras.mixed_precision import Policy
-#
-#
-# class CustomInputLayer(InputLayer):
-#     @classmethod
-#     def from_config(cls, config):
-#         if 'batch_shape' in config:
-#             config['batch_input_shape'] = config.pop('batch_shape')
-#         return super().from_config(config)
-#
-#
-# class CustomBatchNormalization(BatchNormalization):
-#     @classmethod
-#     def from_config(cls, config):
-#         config.pop('synchronized', None)
-#         return super().from_config(config)
-#
-#
-# class CustomSyncBatchNormalization(SyncBatchNormalization):
-#     @classmethod
-#     def from_config(cls, config):
-#         config.pop('synchronized', None)
-#         return super().from_config(config)
-#
-#
-# CUSTOM_OBJECTS = {
-#     'InputLayer': CustomInputLayer,
-#     'BatchNormalization': CustomBatchNormalization,
-#     'SyncBatchNormalization': CustomSyncBatchNormalization,
-#     'DTypePolicy': Policy,
-# }
+
 
 # ---------------------------------------------
 # Flask Application Setup
@@ -53,7 +18,7 @@ app = Flask(__name__)
 CORS(app)
 
 # ---------------------------------------------
-# Model Loading with Compatibility Fixes
+# Model Loading
 # ---------------------------------------------
 try:
     # Load EfficientNet Model
@@ -73,7 +38,7 @@ try:
     )
 
     # Load YOLO Model
-    yolo_model = YOLO("../models/best.pt")
+    yolo_model = YOLO("../models/best.pt").to("cuda")
 
 except Exception as e:
     print(f"Error loading models: {str(e)}")
@@ -213,21 +178,53 @@ def classify_image():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+
 @app.route('/detect-gesture', methods=['GET'])
 def detect_gesture():
     def generate_frames():
-        # Change camera index if needed (0 or 1)
-        cap = cv2.VideoCapture(0)
-        while True:
-            success, frame = cap.read()
-            if not success:
-                break
-            results = yolo_model(frame, conf=0.5, iou=0.5)
-            annotated_frame = results[0].plot()
-            _, buffer = cv2.imencode('.jpg', annotated_frame)
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n')
-        cap.release()
+        # Initialize camera and TTS variables per client
+        cap = cv2.VideoCapture(1)  # Adjust camera index if needed
+        last_spoken = None  # Track last spoken gesture per client
+
+        try:
+            while True:
+                success, frame = cap.read()
+                if not success:
+                    break
+
+                # Perform YOLO detection
+                results = yolo_model(frame, conf=0.3, iou=0.5)
+                annotated_frame = results[0].plot()
+
+                # Process detected gestures for TTS
+                for box in results[0].boxes:
+                    class_id = int(box.cls[0])
+                    class_name = yolo_model.names[class_id]
+
+                    # Speak if a new gesture is detected
+                    if class_name != last_spoken:
+                        def speak(text):
+                            try:
+                                engine = pyttsx3.init()
+                                engine.say(text)
+                                engine.runAndWait()
+                                engine.stop()
+                            except Exception as e:
+                                print(f"TTS Error: {e}")
+
+                        # Start TTS in a new thread to avoid blocking
+                        threading.Thread(target=speak, args=(class_name,)).start()
+                        last_spoken = class_name
+                        break  # Only process the first new gesture per frame
+
+                # Encode and stream the frame
+                _, buffer = cv2.imencode('.jpg', annotated_frame)
+                yield (b'--frame\r\n'
+                       b'Content-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n')
+
+        finally:
+            cap.release()
+
     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/gesture-info/<gesture_id>', methods=['GET'])

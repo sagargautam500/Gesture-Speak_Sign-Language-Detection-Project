@@ -13,7 +13,7 @@ const LiveDemoSection = () => {
       setErrorMessage("");
       setIsCameraActive(true);
       // Set the stream URL to the backend endpoint
-      setStreamUrl("http://192.168.1.70:5000/detect-gesture");
+      setStreamUrl("http://127.0.0.1:5000/detect-gesture");
     } catch (err) {
       console.error("Error starting demo: ", err);
       setErrorMessage("Failed to start the gesture detection stream.");

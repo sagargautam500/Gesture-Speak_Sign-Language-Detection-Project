@@ -90,13 +90,15 @@ The system follows a modular architecture:
     │
     │── GestureSpeak-Backend/       # Flask backend
     │   ├── .venv/                  # Virtual environment
+    |   ├── .idea/ 
     │   ├── accuracy_graphs/        # Model performance graphs
     │   ├── Backend/                # Backend application
     │   │   ├── backend.py          # Main Flask app
-    │   │   ├── Data_collection/    # Scripts for collecting dataset
-    │   │   ├── data_preprocessing/ # Data cleaning and preparation
-    │   │   ├── model_training/     # Training scripts for models
-    │   │   ├── models/             # Pre-trained models (CNN, EfficientNet, YOLO)
+    │   ├── Data_collection/        # Scripts for collecting dataset
+    │   ├── data_preprocessing/     # Data cleaning and preparation
+    │   ├── model_training/         # Training scripts for models
+    │   ├── models/                 # Pre-trained models (CNN, EfficientNet, YOLO)
+    |   ├── requirements.txt        # requiremts tools with version
     │
     │── README.md                   # Project documentation
 

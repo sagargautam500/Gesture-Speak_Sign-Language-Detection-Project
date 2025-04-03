@@ -1,120 +1,65 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState} from 'react';
 import './LiveDemoSection.css';
 
 const LiveDemoSection = () => {
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [detectedText, setDetectedText] = useState("Start performing gestures to detect text...");
   const [errorMessage, setErrorMessage] = useState("");
-  const videoRef = useRef(null);
-  const streamRef = useRef(null);
+  const [streamUrl, setStreamUrl] = useState(null);
 
+  // Start demo - connect to the backend stream
   const startDemo = async () => {
-    setErrorMessage("");
     try {
-      // Check if camera is already active
-      if (isCameraActive) return;
-      
-      // Request camera access
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: {
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-          facingMode: 'user' // or 'environment' for rear camera
-        } 
-      });
-      
-      streamRef.current = stream;
-      
-      // Check if videoRef exists before assigning stream
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.onloadedmetadata = () => {
-          videoRef.current.play().catch(err => {
-            setErrorMessage(`Video play error: ${err.message}`);
-          });
-        };
-      }
-      
+      setErrorMessage("");
       setIsCameraActive(true);
+      // Set the stream URL to the backend endpoint
+      setStreamUrl("http://127.0.0.1:5000/detect-gesture");
     } catch (err) {
-      console.error("Camera access error:", err);
-      setErrorMessage(`Camera error: ${err.message}`);
-      setIsCameraActive(false);
+      console.error("Error starting demo: ", err);
+      setErrorMessage("Failed to start the gesture detection stream.");
+      alert("Failed to start the gesture detection stream.");
     }
   };
 
+  // Stop demo - stop the stream
   const stopDemo = () => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => {
-        track.stop();
-      });
-      streamRef.current = null;
-    }
-    
-    if (videoRef.current) {
-      videoRef.current.srcObject = null;
-    }
-    
+    setStreamUrl(null); // Clearing the URL stops the stream
     setIsCameraActive(false);
+    setDetectedText("Start performing gestures to detect text...");
   };
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      stopDemo();
-    };
-  }, []);
+  
 
   return (
     <section className="live-demo">
-      <h2>GestureSpeak: Live Demo</h2>
+      <h2>GestureSpeak: Test In Real Time</h2>
       <p>Perform sign language gestures to see them detected in real-time.</p>
 
-      {errorMessage && (
-        <div className="error-message">
-          {errorMessage}
-          {errorMessage.includes('permission') && (
-            <p>Please check your browser permissions and allow camera access.</p>
-          )}
-        </div>
-      )}
-
+      {/* Webcam Input (Video Feed) */}
       <div className="demo-area">
-        {!isCameraActive ? (
+        {!isCameraActive && (
           <div className="demo-placeholder">
-            <p>Camera feed will appear here when activated.</p>
+            <p>{errorMessage || "Camera feed will appear here."}</p>
           </div>
-        ) : (
-          <video 
-            ref={videoRef}
-            autoPlay
-            playsInline
-            muted
-            className="video-feed"
-          />
         )}
+        <img 
+          src={streamUrl} 
+          className="video-feed"
+          alt="Real-time gesture detection feed"
+        />
       </div>
 
-      <div className="output-panel">
+      {/* Output Panel */}
+      {/*<div className="output-panel">
         <h3>Detected Gesture:</h3>
         <p>{detectedText}</p>
-      </div>
+        
+      </div>*/}
+      
 
+      {/* Demo Control Buttons */}
       <div className="demo-buttons">
-        <button 
-          onClick={startDemo} 
-          disabled={isCameraActive}
-          className={isCameraActive ? 'disabled' : ''}
-        >
-          {isCameraActive ? 'Camera Active' : 'Start Demo'}
-        </button>
-        <button 
-          onClick={stopDemo} 
-          disabled={!isCameraActive}
-          className={!isCameraActive ? 'disabled' : ''}
-        >
-          Stop Demo
-        </button>
+        <button onClick={startDemo}>Start</button>
+        <button onClick={stopDemo}>Stop</button>
       </div>
     </section>
   );

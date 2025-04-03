@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import "./DetectionSection.css";
 
 const DetectionSection = () => {
@@ -66,9 +66,9 @@ const DetectionSection = () => {
 
   // Function to stop camera
   const stopCamera = () => {
-    const stream = videoRef.current.srcObject;
+    const stream = videoRef.current?.srcObject;
     if (stream) {
-      const tracks = stream.getTracks();           //tracks means:audio and video
+      const tracks = stream.getTracks();
       tracks.forEach((track) => track.stop());
       videoRef.current.srcObject = null;
     }
@@ -101,24 +101,22 @@ const DetectionSection = () => {
   };
 
   // Function to remove background by calling the backend API
-  const removeBackground = async (imageDataUrl) => {
-    const formData = new FormData();
-    formData.append("image", dataURLtoFile(imageDataUrl, "input.png"));
-    try {
-      const response = await fetch("http://127.0.0.1:5000/remove-background", {
-        method: "POST",
-        body: formData,
-      });
-      // Since the API returns a binary image (JPEG), convert response to blob
-      const blob = await response.blob();
-      // Create an object URL for the blob and set it as the processed image
-      const processedImageUrl = URL.createObjectURL(blob);
-      setProcessedImage(processedImageUrl);
-    } catch (error) {
-      console.error("Error removing background:", error);
-    }
-  };
-
+const removeBackground = async (imageDataUrl) => {
+  const formData = new FormData();
+  formData.append("image", dataURLtoFile(imageDataUrl, "input.png"));
+  try {
+    const response = await fetch("http://127.0.0.1:5000/remove-background", {
+      method: "POST",
+      body: formData,
+    });
+    const blob = await response.blob();
+    const processedImageUrl = URL.createObjectURL(blob);
+    setProcessedImage(processedImageUrl);
+    setImage(processedImageUrl); // Set processed image as active
+  } catch (error) {
+    console.error("Error removing background:", error);
+  }
+};
   // Function to detect sign language using the active image
   const detectSignLanguage = async () => {
     if (!image) {
@@ -166,6 +164,39 @@ const DetectionSection = () => {
       alert("Sorry, your browser does not support text-to-speech functionality.");
     }
   };
+
+// Cleanup effect to stop camera when component unmounts
+// Add this useEffect hook near your other useEffect
+useEffect(() => {
+  // 1. Handle browser tab closing/refreshing
+  const handleBeforeUnload = () => {
+    if (streaming) {
+      stopCamera();
+    }
+  };
+
+  window.addEventListener('beforeunload', handleBeforeUnload);
+
+  // 2. Handle React Router navigation (if you're using it)
+  const handleRouteChange = () => {
+    if (streaming) {
+      stopCamera();
+    }
+  };
+
+  // If using React Router v6:
+  if (typeof window !== 'undefined' && window.navigation) {
+    window.navigation.addEventListener('navigate', handleRouteChange);
+  }
+
+  return () => {
+    window.removeEventListener('beforeunload', handleBeforeUnload);
+    if (typeof window !== 'undefined' && window.navigation) {
+      window.navigation.removeEventListener('navigate', handleRouteChange);
+    }
+  };
+}, [streaming]); // Only re-run when streaming changes
+
 
   return (
     <section>

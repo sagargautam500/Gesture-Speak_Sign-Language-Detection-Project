@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import "./SignDetector.css";
 
 const SignDetector = () => {
@@ -121,6 +121,37 @@ const SignDetector = () => {
       alert("Sorry, your browser does not support text-to-speech.");
     }
   };
+
+// Add this useEffect hook near your other useEffect
+useEffect(() => {
+  // 1. Handle browser tab closing/refreshing
+  const handleBeforeUnload = () => {
+    if (camActive) {
+      deactivateCamera();
+    }
+  };
+
+  window.addEventListener('beforeunload', handleBeforeUnload);
+
+  // 2. Handle React Router navigation (if you're using it)
+  const handleRouteChange = () => {
+    if (camActive) {
+      deactivateCamera();
+    }
+  };
+
+  // If using React Router v6:
+  if (typeof window !== 'undefined' && window.navigation) {
+    window.navigation.addEventListener('navigate', handleRouteChange);
+  }
+
+  return () => {
+    window.removeEventListener('beforeunload', handleBeforeUnload);
+    if (typeof window !== 'undefined' && window.navigation) {
+      window.navigation.removeEventListener('navigate', handleRouteChange);
+    }
+  };
+}, [camActive]); // Only re-run when streaming changes
 
   return (
     <article className="sd-container">
